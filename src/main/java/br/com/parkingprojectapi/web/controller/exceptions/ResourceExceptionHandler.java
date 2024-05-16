@@ -3,13 +3,17 @@ package br.com.parkingprojectapi.web.controller.exceptions;
 import br.com.parkingprojectapi.service.exceptions.DifferentPasswordsException;
 import br.com.parkingprojectapi.service.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.Instant;
 
+@Slf4j
 @ControllerAdvice
 public class ResourceExceptionHandler {
 
@@ -28,4 +32,14 @@ public class ResourceExceptionHandler {
         StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<StandardError> methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request, BindingResult result){
+        String error = "Method argument not valid";
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, "Invalid field(s)", request.getRequestURI(), result);
+        log.error("API Error - " + e);
+        return ResponseEntity.status(status).body(err);
+    }
+
 }
