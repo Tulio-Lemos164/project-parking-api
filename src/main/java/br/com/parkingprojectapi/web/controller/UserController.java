@@ -6,6 +6,7 @@ import br.com.parkingprojectapi.web.dto.UserInsertDTO;
 import br.com.parkingprojectapi.web.dto.UserPasswordDTO;
 import br.com.parkingprojectapi.web.dto.UserResponseDTO;
 import br.com.parkingprojectapi.web.dto.mapper.UserMapper;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> insert(@RequestBody UserInsertDTO obj){
+    public ResponseEntity<UserResponseDTO> insert(@Valid @RequestBody UserInsertDTO obj){
         User user = userService.insert(UserMapper.toUser(obj));
         return ResponseEntity.status(201).body(UserMapper.toDTO(user));
     }
