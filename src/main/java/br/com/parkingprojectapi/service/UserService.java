@@ -4,7 +4,9 @@ import br.com.parkingprojectapi.entity.User;
 import br.com.parkingprojectapi.repository.UserRepository;
 import br.com.parkingprojectapi.service.exceptions.DifferentPasswordsException;
 import br.com.parkingprojectapi.service.exceptions.ResourceNotFoundException;
+import br.com.parkingprojectapi.service.exceptions.UsernameUniqueViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +21,12 @@ public class UserService {
 
     @Transactional
     public User insert(User obj) {
-        return userRepository.save(obj);
+        try {
+            return userRepository.save(obj);
+        }
+        catch (DataIntegrityViolationException e){
+            throw new UsernameUniqueViolationException(String.format("Username {%s} already in use", obj.getUsername()));
+        }
     }
 
     @Transactional(readOnly = true)

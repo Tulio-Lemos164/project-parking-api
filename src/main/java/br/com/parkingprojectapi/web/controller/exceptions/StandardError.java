@@ -1,6 +1,7 @@
 package br.com.parkingprojectapi.web.controller.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,8 @@ public class StandardError implements Serializable {
     private String error;
     private String message;
     private String path;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, String> errors;
 
     public StandardError(Instant timestamp, Integer status, String error, String message, String path) {
