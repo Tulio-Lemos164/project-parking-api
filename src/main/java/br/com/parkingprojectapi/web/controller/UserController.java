@@ -8,6 +8,7 @@ import br.com.parkingprojectapi.web.dto.UserPasswordDTO;
 import br.com.parkingprojectapi.web.dto.UserResponseDTO;
 import br.com.parkingprojectapi.web.dto.mapper.UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,7 +49,7 @@ public class UserController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
                     @ApiResponse(responseCode = "404", description = "Resource not found",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
-            })
+    })
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id){
         User user = userService.findById(id);
@@ -64,13 +65,18 @@ public class UserController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
                     @ApiResponse(responseCode = "400", description = "The passwords are different",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
-            })
+    })
     @PatchMapping(value = "/{id}")
     public ResponseEntity<UserResponseDTO> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDTO obj){
         User user = userService.updatePassword(id, obj.getCurrentPassword(), obj.getNewPassword(), obj.getConfirmPassword());
         return ResponseEntity.ok().body(UserMapper.toDTO(user));
     }
 
+    @Operation(summary = "Return all users",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users retrieved successfully",
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class))))
+            })
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> findAll(){
         List<User> users = userService.findAll();
