@@ -109,4 +109,19 @@ public class UserIT {
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
     }
+
+    @Test
+    public void insertUser_AlreadyInUseUsername_ReturnStandardErrorStatus409(){
+        StandardError responseBody;
+        responseBody= webTestClient.post()
+                .uri("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserInsertDTO("ted@gmail.com", "arqted"))
+                .exchange().expectStatus().isEqualTo(409)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(409);
+    }
 }
