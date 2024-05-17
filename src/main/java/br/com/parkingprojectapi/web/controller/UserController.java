@@ -64,6 +64,8 @@ public class UserController {
                     @ApiResponse(responseCode = "404", description = "Resource not found",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
                     @ApiResponse(responseCode = "400", description = "The passwords are different",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
+                    @ApiResponse(responseCode = "422", description = "Incorrect or invalid camps values",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
     })
     @PatchMapping(value = "/{id}")

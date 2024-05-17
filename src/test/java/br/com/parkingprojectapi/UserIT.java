@@ -2,6 +2,7 @@ package br.com.parkingprojectapi;
 
 import br.com.parkingprojectapi.web.controller.exceptions.StandardError;
 import br.com.parkingprojectapi.web.dto.UserInsertDTO;
+import br.com.parkingprojectapi.web.dto.UserPasswordDTO;
 import br.com.parkingprojectapi.web.dto.UserResponseDTO;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -151,5 +152,92 @@ public class UserIT {
 
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void updatePassword_ValidData_ReturnStatus200(){
+        webTestClient.patch()
+                .uri("/api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("arqted", "tedarq", "tedarq"))
+                .exchange().expectStatus().isOk();
+    }
+
+    @Test
+    public void updatePassword_NonExistingId_ReturnStandardErrorStatus404(){
+        StandardError responseBody;
+        responseBody= webTestClient.patch()
+                .uri("/api/v1/users/0")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("arqted", "tedarq", "tedarq"))
+                .exchange().expectStatus().isNotFound()
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void updatePassword_InvalidFields_ReturnStandardErrorStatus422(){
+        StandardError responseBody;
+        responseBody= webTestClient.patch()
+                .uri("/api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("", "", ""))
+                .exchange().expectStatus().isEqualTo(422)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody= webTestClient.patch()
+                .uri("/api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("arqte", "tedar", "tedar"))
+                .exchange().expectStatus().isEqualTo(422)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody= webTestClient.patch()
+                .uri("/api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("arqteddy", "tedarqT", "tedarqT"))
+                .exchange().expectStatus().isEqualTo(422)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+    }
+
+    @Test
+    public void updatePassword_InvalidPasswords_ReturnStandardErrorStatus400(){
+        StandardError responseBody;
+        responseBody= webTestClient.patch()
+                .uri("/api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("arqted", "tedarq", "tedboy"))
+                .exchange().expectStatus().isEqualTo(400)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
+
+        responseBody= webTestClient.patch()
+                .uri("/api/v1/users/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("arqtoy", "tedarq", "tedarq"))
+                .exchange().expectStatus().isEqualTo(400)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
     }
 }
