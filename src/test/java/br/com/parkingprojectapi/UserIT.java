@@ -1,5 +1,6 @@
 package br.com.parkingprojectapi;
 
+import br.com.parkingprojectapi.web.controller.exceptions.StandardError;
 import br.com.parkingprojectapi.web.dto.UserInsertDTO;
 import br.com.parkingprojectapi.web.dto.UserResponseDTO;
 import org.assertj.core.api.Assertions;
@@ -20,8 +21,8 @@ public class UserIT {
 
     @Test
     public void insertUser_UsernameAndPasswordValid_ReturnCreatedUserStatus201(){
-        UserResponseDTO responseDTO;
-        responseDTO= webTestClient.post()
+        UserResponseDTO responseBody;
+        responseBody= webTestClient.post()
                     .uri("/api/v1/users")
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(new UserInsertDTO("marshall@gmail.com", "marlil"))
@@ -29,9 +30,83 @@ public class UserIT {
                     .expectBody(UserResponseDTO.class)
                     .returnResult().getResponseBody();
 
-        Assertions.assertThat(responseDTO).isNotNull();
-        Assertions.assertThat(responseDTO.getId()).isNotNull();
-        Assertions.assertThat(responseDTO.getUsername()).isEqualTo("marshall@gmail.com");
-        Assertions.assertThat(responseDTO.getRole()).isEqualTo("CLIENT");
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getId()).isNotNull();
+        Assertions.assertThat(responseBody.getUsername()).isEqualTo("marshall@gmail.com");
+        Assertions.assertThat(responseBody.getRole()).isEqualTo("CLIENT");
+    }
+
+    @Test
+    public void insertUser_InvalidUsername_ReturnStandardErrorStatus422(){
+        StandardError responseBody;
+        responseBody= webTestClient.post()
+                .uri("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserInsertDTO("", "marlil"))
+                .exchange().expectStatus().isEqualTo(422)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody= webTestClient.post()
+                .uri("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserInsertDTO("marshall@", "marlil"))
+                .exchange().expectStatus().isEqualTo(422)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody= webTestClient.post()
+                .uri("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserInsertDTO("marshall@gmail", "marlil"))
+                .exchange().expectStatus().isEqualTo(422)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+    }
+
+    @Test
+    public void insertUser_InvalidPassword_ReturnStandardErrorStatus422(){
+        StandardError responseBody;
+        responseBody= webTestClient.post()
+                .uri("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserInsertDTO("marshall@gmail.com", ""))
+                .exchange().expectStatus().isEqualTo(422)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody= webTestClient.post()
+                .uri("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserInsertDTO("marshall@gmail.com", "marsh"))
+                .exchange().expectStatus().isEqualTo(422)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody= webTestClient.post()
+                .uri("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserInsertDTO("marshall@gmail.com", "marshmallow"))
+                .exchange().expectStatus().isEqualTo(422)
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
     }
 }
