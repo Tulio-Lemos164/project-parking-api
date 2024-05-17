@@ -8,6 +8,7 @@ import br.com.parkingprojectapi.service.exceptions.ResourceNotFoundException;
 import br.com.parkingprojectapi.service.exceptions.UsernameUniqueViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +21,13 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Transactional
     public User insert(User obj) {
         try {
+            obj.setPassword(passwordEncoder.encode(obj.getPassword()));
             return userRepository.save(obj);
         }
         catch (DataIntegrityViolationException e){
@@ -43,11 +48,11 @@ public class UserService {
         }
 
         User user = findById(id);
-        if (!user.getPassword().equals(currentPassword)){
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())){
             throw new DifferentPasswordsException("Your password does not match the password of the required user");
         }
 
-        user.setPassword(newPassword);
+        user.setPassword(passwordEncoder.encode(newPassword));
         return userRepository.save(user);
     }
 
