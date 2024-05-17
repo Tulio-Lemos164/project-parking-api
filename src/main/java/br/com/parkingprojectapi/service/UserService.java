@@ -1,6 +1,7 @@
 package br.com.parkingprojectapi.service;
 
 import br.com.parkingprojectapi.entity.User;
+import br.com.parkingprojectapi.entity.enums.Role;
 import br.com.parkingprojectapi.repository.UserRepository;
 import br.com.parkingprojectapi.service.exceptions.DifferentPasswordsException;
 import br.com.parkingprojectapi.service.exceptions.ResourceNotFoundException;
@@ -32,7 +33,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findById(Long id) {
         Optional<User> obj = userRepository.findById(id);
-        return obj.orElseThrow(() -> new ResourceNotFoundException(id));
+        return obj.orElseThrow(() -> new ResourceNotFoundException("Resource not found. Username " + id));
     }
 
     @Transactional
@@ -53,5 +54,14 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Resource not found. Username " + username));
+    }
+
+    public Role findRoleByUsername(String username) {
+        return userRepository.finrRoleByUsername(username);
     }
 }
