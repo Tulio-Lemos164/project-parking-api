@@ -5,7 +5,6 @@ import br.com.parkingprojectapi.service.exceptions.ResourceNotFoundException;
 import br.com.parkingprojectapi.service.exceptions.UsernameUniqueViolationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -50,6 +49,14 @@ public class ResourceExceptionHandler {
         HttpStatus status = HttpStatus.CONFLICT;
         StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
         log.error("API Error - " + e);
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(FailedAuthenticationException.class)
+    public ResponseEntity<StandardError> failedAuthenticationException(FailedAuthenticationException e, HttpServletRequest request){
+        String error = "Login authentication error";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 }
