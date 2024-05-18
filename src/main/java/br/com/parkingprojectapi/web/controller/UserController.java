@@ -82,6 +82,7 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "Users retrieved successfully",
                             content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class))))
             })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> findAll(){
         List<User> users = userService.findAll();
