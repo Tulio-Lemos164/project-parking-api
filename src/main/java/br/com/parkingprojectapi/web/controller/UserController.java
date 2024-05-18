@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,6 +52,7 @@ public class UserController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
     })
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasRole('ADMIN') OR (hasRole('CLIENT') AND #id == authentication.principal.id)")
     public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id){
         User user = userService.findById(id);
         return ResponseEntity.ok().body(UserMapper.toDTO(user));
