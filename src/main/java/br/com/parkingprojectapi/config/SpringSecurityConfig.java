@@ -1,5 +1,6 @@
 package br.com.parkingprojectapi.config;
 
+import br.com.parkingprojectapi.jwt.JwtAuthenticationEntryPoint;
 import br.com.parkingprojectapi.jwt.JwtAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,9 @@ public class SpringSecurityConfig {
                 ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(
                         jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class
+                )
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 )
                 .build();
     }
