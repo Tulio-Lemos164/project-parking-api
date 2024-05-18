@@ -70,6 +70,7 @@ public class UserController {
                     @ApiResponse(responseCode = "422", description = "Incorrect or invalid camps values",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
     })
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT') AND (#id == authentication.principal.id)")
     @PatchMapping(value = "/{id}")
     public ResponseEntity<UserResponseDTO> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDTO obj){
         User user = userService.updatePassword(id, obj.getCurrentPassword(), obj.getNewPassword(), obj.getConfirmPassword());
