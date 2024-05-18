@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Operation(summary = "Create a new user on the database",
+    @Operation(summary = "Create a new user on the database", description = "Unrestricted access",
                 responses = {
                 @ApiResponse(responseCode = "201", description = "User created successfully",
                         content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
@@ -44,11 +45,14 @@ public class UserController {
         return ResponseEntity.status(201).body(UserMapper.toDTO(user));
     }
 
-    @Operation(summary = "Find a user by their id",
+    @Operation(summary = "Find a user by their id", description = "Access partially restricted to ADMIN. Clients can only retrieve their own user data",
+            security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "User retrieved successfully",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
                     @ApiResponse(responseCode = "404", description = "Resource not found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
+                    @ApiResponse(responseCode = "403", description = "user without permission to access this resource",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
     })
     @GetMapping(value = "/{id}")
@@ -59,7 +63,8 @@ public class UserController {
     }
 
 
-    @Operation(summary = "Update the password",
+    @Operation(summary = "Update the password", description = "Access fully restricted to the owner of the id passed as parameter",
+            security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "204", description = "Password updated",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
@@ -68,6 +73,8 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "The passwords are different",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
                     @ApiResponse(responseCode = "422", description = "Incorrect or invalid camps values",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
+                    @ApiResponse(responseCode = "403", description = "user without permission to access this resource",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT') AND (#id == authentication.principal.id)")
@@ -77,10 +84,13 @@ public class UserController {
         return ResponseEntity.ok().body(UserMapper.toDTO(user));
     }
 
-    @Operation(summary = "Return all users",
+    @Operation(summary = "Return all users", description = "Access fully restricted to ADMIN",
+            security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Users retrieved successfully",
-                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class))))
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class)))),
+                    @ApiResponse(responseCode = "403", description = "user without permission to access this resource",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
             })
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
