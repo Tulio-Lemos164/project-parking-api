@@ -66,7 +66,8 @@ public class UserService {
         return userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Resource not found. Username " + username));
     }
 
+    @Transactional(readOnly = true)
     public Role findRoleByUsername(String username) {
-        return userRepository.finrRoleByUsername(username);
+        return userRepository.findRoleByUsername(username);
     }
 }
