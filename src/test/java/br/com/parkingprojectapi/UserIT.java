@@ -237,6 +237,7 @@ public class UserIT {
         StandardError responseBody;
         responseBody= webTestClient.patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserPasswordDTO("", "", ""))
                 .exchange().expectStatus().isEqualTo(422)
@@ -248,6 +249,7 @@ public class UserIT {
 
         responseBody= webTestClient.patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserPasswordDTO("arqte", "tedar", "tedar"))
                 .exchange().expectStatus().isEqualTo(422)
@@ -259,6 +261,7 @@ public class UserIT {
 
         responseBody= webTestClient.patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserPasswordDTO("arqteddy", "tedarqT", "tedarqT"))
                 .exchange().expectStatus().isEqualTo(422)
@@ -274,6 +277,7 @@ public class UserIT {
         StandardError responseBody;
         responseBody= webTestClient.patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserPasswordDTO("arqted", "tedarq", "tedboy"))
                 .exchange().expectStatus().isEqualTo(400)
@@ -285,6 +289,7 @@ public class UserIT {
 
         responseBody= webTestClient.patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserPasswordDTO("arqtoy", "tedarq", "tedarq"))
                 .exchange().expectStatus().isEqualTo(400)
