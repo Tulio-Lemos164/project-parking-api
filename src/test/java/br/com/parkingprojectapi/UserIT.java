@@ -197,27 +197,39 @@ public class UserIT {
     }
 
     @Test
-    public void updatePassword_ValidData_ReturnStatus200(){
+    public void updatePassword_ValidDataADMIN_ReturnStatus200(){
+        webTestClient.patch()
+                .uri("/api/v1/users/200")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserPasswordDTO("barney", "notTed", "notTed"))
+                .exchange().expectStatus().isOk();
+    }
+
+    @Test
+    public void updatePassword_ValidDataCLIENT_ReturnStatus200(){
         webTestClient.patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserPasswordDTO("arqted", "tedarq", "tedarq"))
                 .exchange().expectStatus().isOk();
     }
 
     @Test
-    public void updatePassword_NonExistingId_ReturnStandardErrorStatus404(){
+    public void updatePassword_DifferentUsers_ReturnStandardErrorStatus403(){
         StandardError responseBody;
         responseBody= webTestClient.patch()
-                .uri("/api/v1/users/0")
+                .uri("/api/v1/users/200")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserPasswordDTO("arqted", "tedarq", "tedarq"))
-                .exchange().expectStatus().isNotFound()
+                .exchange().expectStatus().isForbidden()
                 .expectBody(StandardError.class)
                 .returnResult().getResponseBody();
 
         Assertions.assertThat(responseBody).isNotNull();
-        Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
     }
 
     @Test

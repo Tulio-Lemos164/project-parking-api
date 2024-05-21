@@ -66,10 +66,7 @@ public class UserController {
     @Operation(summary = "Update the password", description = "Access fully restricted to the owner of the id passed as parameter",
             security = @SecurityRequirement(name = "security"),
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Password updated",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
-                    @ApiResponse(responseCode = "404", description = "Resource not found",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
+                    @ApiResponse(responseCode = "204", description = "Password updated"),
                     @ApiResponse(responseCode = "400", description = "The passwords are different",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
                     @ApiResponse(responseCode = "422", description = "Incorrect or invalid camps values",
@@ -81,7 +78,7 @@ public class UserController {
     @PatchMapping(value = "/{id}")
     public ResponseEntity<UserResponseDTO> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDTO obj){
         User user = userService.updatePassword(id, obj.getCurrentPassword(), obj.getNewPassword(), obj.getConfirmPassword());
-        return ResponseEntity.ok().body(UserMapper.toDTO(user));
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Return all users", description = "Access fully restricted to ADMIN",
