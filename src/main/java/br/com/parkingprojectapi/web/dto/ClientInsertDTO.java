@@ -17,6 +17,6 @@ public class ClientInsertDTO {
 
     @NotBlank(message = "The cpf must be not blank")
     @Size(min = 11, max = 11, message = "The cpf must have 11 digits")
-    @CPF
+    @CPF(message = "CPF must be valid and have 11 digits")
     private String cpf;
 }
