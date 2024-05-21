@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@Tag(name = "Authentication", description = "Authenticate a user")
+@Tag(name = "Authentication", description = "resources to authenticate a user")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
@@ -41,9 +41,11 @@ public class AuthenticationController {
 
     @Operation(summary = "Authenticate a User for its username and password",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "User Authenticated",
+                    @ApiResponse(responseCode = "200", description = "User Authenticated successfully and returned a bearer token",
                             content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class)))),
-                    @ApiResponse(responseCode = "400", description = "User authentication failed",
+                    @ApiResponse(responseCode = "400", description = "Invalid credentials",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
+                    @ApiResponse(responseCode = "422", description = "Invalid fields",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
             })
     @PostMapping("/auth")
