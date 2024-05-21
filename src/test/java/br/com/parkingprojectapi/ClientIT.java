@@ -169,7 +169,7 @@ public class ClientIT {
     }
 
     @Test
-    public void findUserById_ExistingId_ReturnUserStatus200(){
+    public void findClientById_ExistingIdByAdmin_ReturnClientStatus200(){
         ClientResponseDTO responseBody;
         responseBody= webTestClient.get()
                 .uri("/api/v1/clients/10")
@@ -182,5 +182,33 @@ public class ClientIT {
         Assertions.assertThat(responseBody.getId()).isEqualTo(10);
         Assertions.assertThat(responseBody.getName()).isEqualTo("Ted Mosby");
         Assertions.assertThat(responseBody.getCpf()).isEqualTo("65712430088");
+    }
+
+    @Test
+    public void findClientById_NonExistingIdByAdmin_ReturnStandardErrorStatus404(){
+        StandardError responseBody;
+        responseBody= webTestClient.get()
+                .uri("/api/v1/clients/12")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange().expectStatus().isNotFound()
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void findClientById_ExistingIdByClient_ReturnStandardErrorStatus403(){
+        StandardError responseBody;
+        responseBody= webTestClient.get()
+                .uri("/api/v1/clients/10")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .exchange().expectStatus().isForbidden()
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
     }
 }
