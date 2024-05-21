@@ -1,5 +1,6 @@
 package br.com.parkingprojectapi.web.controller.exceptions;
 
+import br.com.parkingprojectapi.service.exceptions.CpfUniqueViolationException;
 import br.com.parkingprojectapi.service.exceptions.DifferentPasswordsException;
 import br.com.parkingprojectapi.service.exceptions.ResourceNotFoundException;
 import br.com.parkingprojectapi.service.exceptions.UsernameUniqueViolationException;
@@ -66,6 +67,15 @@ public class ResourceExceptionHandler {
         String error = "Access Denied";
         HttpStatus status = HttpStatus.FORBIDDEN;
         StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(CpfUniqueViolationException.class)
+    public ResponseEntity<StandardError> cpfUniqueViolation(CpfUniqueViolationException e, HttpServletRequest request){
+        String error = "Username unique violation";
+        HttpStatus status = HttpStatus.CONFLICT;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        log.error("API Error - " + e);
         return ResponseEntity.status(status).body(err);
     }
 }
