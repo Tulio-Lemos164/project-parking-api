@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.br.CPF;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class ClientCreateDTO {
+public class ClientInsertDTO {
 
     @NotBlank(message = "The name must be not blank")
     @Size(min = 3, max = 200)
