@@ -173,12 +173,27 @@ public class UserIT {
         StandardError responseBody;
         responseBody= webTestClient.get()
                 .uri("/api/v1/users/0")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
                 .exchange().expectStatus().isNotFound()
                 .expectBody(StandardError.class)
                 .returnResult().getResponseBody();
 
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void findUserById_ClientUserSearchingOtherIdThanHis_ReturnStandardErrorStatus403(){
+        StandardError responseBody;
+        responseBody= webTestClient.get()
+                .uri("/api/v1/users/150")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .exchange().expectStatus().isForbidden()
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
     }
 
     @Test
