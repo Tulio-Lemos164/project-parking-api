@@ -2,6 +2,7 @@ package br.com.parkingprojectapi.service;
 
 import br.com.parkingprojectapi.entity.Client;
 import br.com.parkingprojectapi.repository.ClientRepository;
+import br.com.parkingprojectapi.repository.projection.ClientProjection;
 import br.com.parkingprojectapi.service.exceptions.CpfUniqueViolationException;
 import br.com.parkingprojectapi.service.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class ClientService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Client> findAll(Pageable pageable){
-        return clientRepository.findAll(pageable);
+    public Page<ClientProjection> findAll(Pageable pageable){
+        return clientRepository.findAllPageable(pageable);
     }
 }

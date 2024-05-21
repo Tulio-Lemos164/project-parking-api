@@ -3,13 +3,16 @@ package br.com.parkingprojectapi.web.controller;
 
 import br.com.parkingprojectapi.entity.Client;
 import br.com.parkingprojectapi.jwt.JwtUserDetails;
+import br.com.parkingprojectapi.repository.projection.ClientProjection;
 import br.com.parkingprojectapi.service.ClientService;
 import br.com.parkingprojectapi.service.UserService;
 import br.com.parkingprojectapi.web.controller.exceptions.StandardError;
 import br.com.parkingprojectapi.web.dto.ClientInsertDTO;
 import br.com.parkingprojectapi.web.dto.ClientResponseDTO;
+import br.com.parkingprojectapi.web.dto.PageableDTO;
 import br.com.parkingprojectapi.web.dto.UserResponseDTO;
 import br.com.parkingprojectapi.web.dto.mapper.ClientMapper;
+import br.com.parkingprojectapi.web.dto.mapper.PageableMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -76,8 +79,8 @@ public class ClientController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<Client>> findAll(Pageable pageable){
-        Page<Client> clients = clientService.findAll(pageable);
-        return ResponseEntity.ok().body(clients);
+    public ResponseEntity<PageableDTO> findAll(Pageable pageable){
+        Page<ClientProjection> clients = clientService.findAll(pageable);
+        return ResponseEntity.ok().body(PageableMapper.toDto(clients));
     }
 }
