@@ -8,20 +8,19 @@ import br.com.parkingprojectapi.service.UserService;
 import br.com.parkingprojectapi.web.controller.exceptions.StandardError;
 import br.com.parkingprojectapi.web.dto.ClientInsertDTO;
 import br.com.parkingprojectapi.web.dto.ClientResponseDTO;
+import br.com.parkingprojectapi.web.dto.UserResponseDTO;
 import br.com.parkingprojectapi.web.dto.mapper.ClientMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "api/v1/clients")
@@ -42,7 +41,7 @@ public class ClientController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
                     @ApiResponse(responseCode = "422", description = "Invalid input data, resources not created",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
-                    @ApiResponse(responseCode = "403", description = "Resource not available for ADMIN",
+                    @ApiResponse(responseCode = "403", description = "Resource not available for ADMIN role",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
             })
     @PostMapping
@@ -52,5 +51,22 @@ public class ClientController {
         client.setUser(userService.findById(userDetails.getId()));
         clientService.insert(client);
         return ResponseEntity.status(201).body(ClientMapper.toDTO(client));
+    }
+
+    @Operation(summary = "Find a client by their id", description = "Access restricted to ADMIN",
+            security = @SecurityRequirement(name = "security"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Client retrieved successfully",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+                    @ApiResponse(responseCode = "404", description = "Resource not found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource not available for CLIENT role",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
+            })
+    @GetMapping(value = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ClientResponseDTO> findById(@PathVariable Long id){
+        Client client = clientService.findById(id);
+        return ResponseEntity.ok().body(ClientMapper.toDTO(client));
     }
 }

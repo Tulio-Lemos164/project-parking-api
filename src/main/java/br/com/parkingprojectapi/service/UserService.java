@@ -38,7 +38,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findById(Long id) {
         Optional<User> obj = userRepository.findById(id);
-        return obj.orElseThrow(() -> new ResourceNotFoundException("Resource not found. Username " + id));
+        return obj.orElseThrow(() -> new ResourceNotFoundException("Resource not found. Id " + id));
     }
 
     @Transactional
