@@ -301,15 +301,30 @@ public class UserIT {
     }
 
     @Test
-    public void findAllUsers_GotAllUsers_ReturnUserStatus200(){
+    public void findAllUsers_GotAllUsersADMINPermission_ReturnUserStatus200(){
         List<UserResponseDTO> responseBody;
         responseBody= webTestClient.get()
                 .uri("/api/v1/users")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
                 .exchange().expectStatus().isOk()
                 .expectBodyList(UserResponseDTO.class)
                 .returnResult().getResponseBody();
 
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.size()).isEqualTo(4);
+    }
+
+    @Test
+    public void findAllUsers_GotAllUsersNoPermission_ReturnUserStatus403(){
+        StandardError responseBody;
+        responseBody= webTestClient.get()
+                .uri("/api/v1/users")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .exchange().expectStatus().isForbidden()
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
     }
 }
