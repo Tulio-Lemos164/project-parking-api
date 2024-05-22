@@ -35,7 +35,7 @@ public class SpaceController {
     @Operation(summary = "Create a new space on the database", description = "Access restricted to ADMIN",
             security = @SecurityRequirement(name = "security"),
             responses = {
-                    @ApiResponse(responseCode = "201", description = "User created successfully",
+                    @ApiResponse(responseCode = "201", description = "Parking space created successfully",
                             headers = @Header(name = HttpHeaders.LOCATION, description = "Space created successfully")),
                     @ApiResponse(responseCode = "409", description = "Code already in use",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
