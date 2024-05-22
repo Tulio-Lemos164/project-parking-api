@@ -1,6 +1,8 @@
 package br.com.parkingprojectapi;
 
 import br.com.parkingprojectapi.web.dto.SpaceInsertDTO;
+import br.com.parkingprojectapi.web.dto.SpaceResponseDTO;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -70,5 +72,32 @@ public class SpacesIT {
                 .expectBody()
                 .jsonPath("status").isEqualTo(422)
                 .jsonPath("path").isEqualTo("/api/v1/spaces");
+    }
+
+    @Test
+    public void findSpaceByCode_ExistingCode_ReturnSpaceStatus200(){
+        webTestClient
+                .get()
+                .uri("api/v1/spaces/{code}", "A-01")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("id").isEqualTo(10)
+                .jsonPath("status").isEqualTo("FREE")
+                .jsonPath("code").isEqualTo("A-01");
+    }
+
+    @Test
+    public void insertSpace_NonExistingCode_ReturnStandardErrorStatus404(){
+        webTestClient
+                .get()
+                .uri("api/v1/spaces/{code}", "A-10")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("status").isEqualTo(404)
+                .jsonPath("path").isEqualTo("/api/v1/spaces/A-10");
     }
 }
