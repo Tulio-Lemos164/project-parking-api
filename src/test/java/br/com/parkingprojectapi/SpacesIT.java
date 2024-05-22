@@ -1,8 +1,6 @@
 package br.com.parkingprojectapi;
 
 import br.com.parkingprojectapi.web.dto.SpaceInsertDTO;
-import br.com.parkingprojectapi.web.dto.SpaceResponseDTO;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +28,21 @@ public class SpacesIT {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectHeader().exists(HttpHeaders.LOCATION);
+    }
+
+    @Test
+    public void insertSpace_NotAllowedUser_ReturnStandardErrorStatus403(){
+        webTestClient
+                .post()
+                .uri("api/v1/spaces")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .bodyValue(new SpaceInsertDTO("A-05", "FREE"))
+                .exchange()
+                .expectStatus().isEqualTo(403)
+                .expectBody()
+                .jsonPath("status").isEqualTo(403)
+                .jsonPath("path").isEqualTo("/api/v1/spaces");
     }
 
     @Test
@@ -89,7 +102,20 @@ public class SpacesIT {
     }
 
     @Test
-    public void insertSpace_NonExistingCode_ReturnStandardErrorStatus404(){
+    public void findSpaceByCode_NotAllowedUser_ReturnStandardErrorStatus403(){
+        webTestClient
+                .get()
+                .uri("api/v1/spaces/{code}", "A-3")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .exchange()
+                .expectStatus().isEqualTo(403)
+                .expectBody()
+                .jsonPath("status").isEqualTo(403)
+                .jsonPath("path").isEqualTo("/api/v1/spaces/A-3");
+    }
+
+    @Test
+    public void findSpaceByCode_NonExistingCode_ReturnStandardErrorStatus404(){
         webTestClient
                 .get()
                 .uri("api/v1/spaces/{code}", "A-10")
