@@ -9,6 +9,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static br.com.parkingprojectapi.entity.enums.SpaceStatus.FREE;
+
 @Service
 public class SpaceService {
 
@@ -28,5 +30,10 @@ public class SpaceService {
     @Transactional(readOnly = true)
     public Space findByCode(String code){
         return spaceRepository.findByCode(code).orElseThrow(() -> new ResourceNotFoundException("Resource not found. Code " + code));
+    }
+
+    @Transactional
+    public Space findFreeSpace() {
+        return spaceRepository.findFirstByStatus(FREE).orElseThrow(() -> new ResourceNotFoundException("No empty space was found!"));
     }
 }
