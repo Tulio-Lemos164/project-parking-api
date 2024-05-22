@@ -4,6 +4,7 @@ package br.com.parkingprojectapi;
 import br.com.parkingprojectapi.web.controller.exceptions.StandardError;
 import br.com.parkingprojectapi.web.dto.ClientInsertDTO;
 import br.com.parkingprojectapi.web.dto.ClientResponseDTO;
+import br.com.parkingprojectapi.web.dto.PageableDTO;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -203,6 +204,48 @@ public class ClientIT {
         StandardError responseBody;
         responseBody= webTestClient.get()
                 .uri("/api/v1/clients/10")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .exchange().expectStatus().isForbidden()
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    public void findAllClients_PaginationByAdmin_ReturnClientStatus200(){
+        PageableDTO responseBody;
+        responseBody= webTestClient.get()
+                .uri("/api/v1/clients")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange().expectStatus().isOk()
+                .expectBody(PageableDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(2);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(0);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(1);
+
+        responseBody= webTestClient.get()
+                .uri("/api/v1/clients?size=1&page=1")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange().expectStatus().isOk()
+                .expectBody(PageableDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+    }
+
+    @Test
+    public void findAllClients_PaginationIdByClient_ReturnStandardErrorStatus403(){
+        StandardError responseBody;
+        responseBody= webTestClient.get()
+                .uri("/api/v1/clients")
                 .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
                 .exchange().expectStatus().isForbidden()
                 .expectBody(StandardError.class)
