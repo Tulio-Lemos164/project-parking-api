@@ -14,14 +14,19 @@ import br.com.parkingprojectapi.web.dto.UserResponseDTO;
 import br.com.parkingprojectapi.web.dto.mapper.ClientMapper;
 import br.com.parkingprojectapi.web.dto.mapper.PageableMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Clients", description = "Contains all the operations to inset, retrieve and update a client")
 @RestController
 @RequestMapping(value = "api/v1/clients")
 public class ClientController {
@@ -41,6 +47,7 @@ public class ClientController {
 
 
     @Operation(summary = "Create a new client on the database", description = "Creates a new client linked to a User with CLIENT role",
+            security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "201", description = "Client created successfully",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDTO.class))),
@@ -77,9 +84,28 @@ public class ClientController {
         return ResponseEntity.ok().body(ClientMapper.toDTO(client));
     }
 
+    @Operation(summary = "Return all clients", description = "Access fully restricted to ADMIN",
+            security = @SecurityRequirement(name = "security"),
+            parameters = {
+                    @Parameter(in = ParameterIn.QUERY, name = "page",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "0")),
+                            description = "Represents the page being returned"),
+                    @Parameter(in = ParameterIn.QUERY, name = "size",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "20")),
+                            description = "Represents the total quantity of elements on a page"),
+                    @Parameter(in = ParameterIn.QUERY, name = "sort", hidden = true,
+                            content = @Content(schema = @Schema(type = "string", defaultValue = "id,asc")),
+                            description = "Represents the ordering of results. Multiple sort parameters are supported"),
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Clients retrieved successfully",
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class)))),
+                    @ApiResponse(responseCode = "403", description = "user without permission to access this resource",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
+            })
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PageableDTO> findAll(Pageable pageable){
+    public ResponseEntity<PageableDTO> findAll(@Parameter(hidden = true) @PageableDefault(size = 5, sort = {"name"}) Pageable pageable){
         Page<ClientProjection> clients = clientService.findAll(pageable);
         return ResponseEntity.ok().body(PageableMapper.toDto(clients));
     }
