@@ -14,7 +14,7 @@ public class SpaceMapper {
         return new ModelMapper().map(spaceInsertDTO, Space.class);
     }
 
-    public static SpaceResponseDTO spaceResponseDTO(Space space){
+    public static SpaceResponseDTO toDTO(Space space){
         return new ModelMapper().map(space, SpaceResponseDTO.class);
     }
 }
