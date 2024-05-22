@@ -110,6 +110,14 @@ public class ClientController {
         return ResponseEntity.ok().body(PageableMapper.toDto(clients));
     }
 
+    @Operation(summary = "Return the details about the logged Client", description = "Access fully restricted to CLIENT",
+            security = @SecurityRequirement(name = "security"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Client data retrieved successfully",
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class)))),
+                    @ApiResponse(responseCode = "403", description = "user without permission to access this resource",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
+            })
     @GetMapping("/details")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<ClientResponseDTO> findDetails(@AuthenticationPrincipal JwtUserDetails userDetails){

@@ -254,4 +254,34 @@ public class ClientIT {
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
     }
+
+    @Test
+    public void findDetailsOfClient_UsingClientToken_ReturnClientStatus200(){
+        ClientResponseDTO responseBody;
+        responseBody= webTestClient.get()
+                .uri("/api/v1/clients/details")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .exchange().expectStatus().isOk()
+                .expectBody(ClientResponseDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getId()).isEqualTo(10);
+        Assertions.assertThat(responseBody.getName()).isEqualTo("Ted Mosby");
+        Assertions.assertThat(responseBody.getCpf()).isEqualTo("65712430088");
+    }
+
+    @Test
+    public void findDetailsOfClient_UsingAdminToken_ReturnStandardErrorStatus403(){
+        StandardError responseBody;
+        responseBody= webTestClient.get()
+                .uri("/api/v1/clients/details")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange().expectStatus().isForbidden()
+                .expectBody(StandardError.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
+    }
 }
