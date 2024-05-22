@@ -1,9 +1,6 @@
 package br.com.parkingprojectapi.web.controller.exceptions;
 
-import br.com.parkingprojectapi.service.exceptions.CpfUniqueViolationException;
-import br.com.parkingprojectapi.service.exceptions.DifferentPasswordsException;
-import br.com.parkingprojectapi.service.exceptions.ResourceNotFoundException;
-import br.com.parkingprojectapi.service.exceptions.UsernameUniqueViolationException;
+import br.com.parkingprojectapi.service.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -72,7 +69,16 @@ public class ResourceExceptionHandler {
 
     @ExceptionHandler(CpfUniqueViolationException.class)
     public ResponseEntity<StandardError> cpfUniqueViolation(CpfUniqueViolationException e, HttpServletRequest request){
-        String error = "Username unique violation";
+        String error = "CPF unique violation";
+        HttpStatus status = HttpStatus.CONFLICT;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        log.error("API Error - " + e);
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(CodeUniqueViolationException.class)
+    public ResponseEntity<StandardError> codeUniqueViolation(CodeUniqueViolationException e, HttpServletRequest request){
+        String error = "Code unique violation";
         HttpStatus status = HttpStatus.CONFLICT;
         StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
         log.error("API Error - " + e);
