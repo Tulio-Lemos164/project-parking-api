@@ -110,7 +110,7 @@ public class ParkingController {
         return ResponseEntity.ok().body(parkingResponseDTO);
     }
 
-    @Operation(summary = "Return all registered parking lots of one client", description = "Access fully restricted to ADMIN",
+    @Operation(summary = "Return all registered parking lots of one client by their cpf", description = "Access fully restricted to ADMIN",
             security = @SecurityRequirement(name = "security"),
             parameters = {
                     @Parameter(in = ParameterIn.QUERY, name = "cpf",
@@ -140,6 +140,25 @@ public class ParkingController {
         return ResponseEntity.ok().body(pageableDTO);
     }
 
+    @Operation(summary = "Return all registered parking lots of one client by their id", description = "Access fully restricted to CLIENT",
+            security = @SecurityRequirement(name = "security"),
+            parameters = {
+                    @Parameter(in = ParameterIn.QUERY, name = "page",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "0")),
+                            description = "Represents the page being returned"),
+                    @Parameter(in = ParameterIn.QUERY, name = "size",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "5")),
+                            description = "Represents the total quantity of elements on a page"),
+                    @Parameter(in = ParameterIn.QUERY, name = "sort", hidden = true,
+                            content = @Content(schema = @Schema(type = "string", defaultValue = "id,asc")),
+                            description = "Represents the ordering of results. Multiple sort parameters are supported"),
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Parking data retrieved successfully",
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ClientResponseDTO.class)))),
+                    @ApiResponse(responseCode = "403", description = "user without permission to access this resource",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
+            })
     @GetMapping
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<PageableDTO> findAllParkingOfClient(@AuthenticationPrincipal JwtUserDetails userDetails, @PageableDefault(size = 5, sort = "entryDate", direction = Sort.Direction.ASC)Pageable pageable){
