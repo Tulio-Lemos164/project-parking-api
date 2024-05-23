@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Entity
-@Table(name = "Clients_Has_Spaces")
+@Table(name = "clients_has_spaces")
 @EntityListeners(AuditingEntityListener.class)
 public class ClientSpace {
 
@@ -47,7 +47,7 @@ public class ClientSpace {
     @Column(name = "exit_date")
     private LocalDateTime exitDate;
 
-    @Column(name = "value", columnDefinition = "decimal(7,2)")
+    @Column(name = "paymentValue", columnDefinition = "decimal(7,2)")
     private BigDecimal value;
 
     @Column(name = "discount", columnDefinition = "decimal(7,2)")
