@@ -67,7 +67,7 @@ public class ParkingController {
             })
     @GetMapping(value = "/check-in/{receipt}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
-    public ResponseEntity<ParkingResponseDTO> findByReceipt(@RequestBody @Valid String receipt){
+    public ResponseEntity<ParkingResponseDTO> findByReceipt(@PathVariable String receipt){
         ClientSpace clientSpace = parkingService.findByReceipt(receipt);
         ParkingResponseDTO parkingResponseDTO = ClientSpaceMapper.toDTO(clientSpace);
         return ResponseEntity.ok().body(parkingResponseDTO);

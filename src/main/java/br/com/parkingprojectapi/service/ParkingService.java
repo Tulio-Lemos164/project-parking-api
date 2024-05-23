@@ -39,6 +39,7 @@ public class ParkingService {
         return clientSpaceService.insert(clientSpace);
     }
 
+    @Transactional(readOnly = true)
     public ClientSpace findByReceipt(String receipt) {
         return clientSpaceService.findByReceipt(receipt);
     }
