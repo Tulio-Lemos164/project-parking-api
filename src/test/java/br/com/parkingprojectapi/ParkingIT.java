@@ -355,4 +355,50 @@ public class ParkingIT {
                 .jsonPath("status").isEqualTo("403")
                 .jsonPath("path").isEqualTo("/api/v1/parking-lots/cpf/65712430088");
     }
+
+    @Test
+    public void findAllParking_OfLoggedClientById_ReturnStatus200(){
+        PageableDTO responseBody;
+
+        responseBody = webTestClient
+                .get()
+                .uri("/api/v1/parking-lots?size=1&page=0")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PageableDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(0);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+
+        responseBody = webTestClient
+                .get()
+                .uri("/api/v1/parking-lots?size=1&page=1")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PageableDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+    }
+
+    @Test
+    public void findAllParking_OfLoggedClientByIdWithRoleADMIN_ReturnStandardError403(){
+        webTestClient
+                .get()
+                .uri("/api/v1/parking-lots")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo("403")
+                .jsonPath("path").isEqualTo("/api/v1/parking-lots");
+    }
 }
