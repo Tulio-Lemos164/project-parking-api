@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -42,5 +43,25 @@ public class ParkingService {
     @Transactional(readOnly = true)
     public ClientSpace findByReceipt(String receipt) {
         return clientSpaceService.findByReceipt(receipt);
+    }
+
+    @Transactional
+    public ClientSpace checkOut(String receipt) {
+        ClientSpace clientSpace = clientSpaceService.findByReceipt(receipt);
+
+        LocalDateTime exitDate = LocalDateTime.now();
+        clientSpace.setExitDate(exitDate);
+
+        BigDecimal paymentValue = ParkingUtils.calculateCost(clientSpace.getEntryDate(), exitDate);
+        clientSpace.setValue(paymentValue);
+
+        long numberOfTimes = clientSpaceService.findTotalTimesFullParking(clientSpace.getClient().getCpf());
+
+        BigDecimal discount = ParkingUtils.calculateDiscount(paymentValue, numberOfTimes);
+        clientSpace.setDiscount(discount);
+
+        clientSpace.getSpace().setStatus(SpaceStatus.FREE);
+
+        return clientSpaceService.insert(clientSpace);
     }
 }

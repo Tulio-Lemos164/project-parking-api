@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ClientSpaceRepository extends JpaRepository<ClientSpace, Long> {
     Optional<ClientSpace> findByReceiptAndExitDateIsNull(String receipt);
+
+    long countByClientCpfAndExitDateIsNotNull(String cpf);
 }

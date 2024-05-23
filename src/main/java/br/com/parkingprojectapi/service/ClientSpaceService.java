@@ -23,4 +23,9 @@ public class ClientSpaceService {
         return clientSpaceRepository.findByReceiptAndExitDateIsNull(receipt)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Receipt '%s' not found or check-out was already made.", receipt)));
     }
+
+    @Transactional(readOnly = true)
+    public long findTotalTimesFullParking(String cpf) {
+        return clientSpaceRepository.countByClientCpfAndExitDateIsNotNull(cpf);
+    }
 }
