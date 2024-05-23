@@ -72,4 +72,9 @@ public class ParkingService {
     public Page<ClientSpaceProjection> findAllByClientCpf(String cpf, Pageable pageable) {
         return clientSpaceService.findAllByClientCpf(cpf, pageable);
     }
+
+    @Transactional(readOnly = true)
+    public Page<ClientSpaceProjection> findAllByUserId(Long id, Pageable pageable) {
+        return clientSpaceService.findAllByUserId(id, pageable);
+    }
 }

@@ -1,6 +1,7 @@
 package br.com.parkingprojectapi.web.controller;
 
 import br.com.parkingprojectapi.entity.ClientSpace;
+import br.com.parkingprojectapi.jwt.JwtUserDetails;
 import br.com.parkingprojectapi.repository.projection.ClientSpaceProjection;
 import br.com.parkingprojectapi.service.ParkingService;
 import br.com.parkingprojectapi.web.controller.exceptions.StandardError;
@@ -28,6 +29,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -134,6 +136,14 @@ public class ParkingController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageableDTO> findAllParkingByCpf(@PathVariable String cpf, @PageableDefault(size = 5, sort = "entryDate", direction = Sort.Direction.ASC)Pageable pageable){
         Page<ClientSpaceProjection> projection = parkingService.findAllByClientCpf(cpf, pageable);
+        PageableDTO pageableDTO = PageableMapper.toDto(projection);
+        return ResponseEntity.ok().body(pageableDTO);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageableDTO> findAllParkingOfClient(@AuthenticationPrincipal JwtUserDetails userDetails, @PageableDefault(size = 5, sort = "entryDate", direction = Sort.Direction.ASC)Pageable pageable){
+        Page<ClientSpaceProjection> projection = parkingService.findAllByUserId(userDetails.getId(), pageable);
         PageableDTO pageableDTO = PageableMapper.toDto(projection);
         return ResponseEntity.ok().body(pageableDTO);
     }
