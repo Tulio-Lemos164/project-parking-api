@@ -4,6 +4,7 @@ import br.com.parkingprojectapi.entity.ClientSpace;
 import br.com.parkingprojectapi.repository.projection.ClientSpaceProjection;
 import br.com.parkingprojectapi.service.ParkingService;
 import br.com.parkingprojectapi.web.controller.exceptions.StandardError;
+import br.com.parkingprojectapi.web.dto.ClientResponseDTO;
 import br.com.parkingprojectapi.web.dto.PageableDTO;
 import br.com.parkingprojectapi.web.dto.ParkingInsertDTO;
 import br.com.parkingprojectapi.web.dto.ParkingResponseDTO;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -106,6 +108,28 @@ public class ParkingController {
         return ResponseEntity.ok().body(parkingResponseDTO);
     }
 
+    @Operation(summary = "Return all registered parking lots of one client", description = "Access fully restricted to ADMIN",
+            security = @SecurityRequirement(name = "security"),
+            parameters = {
+                    @Parameter(in = ParameterIn.QUERY, name = "cpf",
+                            description = "Cpf number of the client being searched",
+                            required = true),
+                    @Parameter(in = ParameterIn.QUERY, name = "page",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "0")),
+                            description = "Represents the page being returned"),
+                    @Parameter(in = ParameterIn.QUERY, name = "size",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "5")),
+                            description = "Represents the total quantity of elements on a page"),
+                    @Parameter(in = ParameterIn.QUERY, name = "sort", hidden = true,
+                            content = @Content(schema = @Schema(type = "string", defaultValue = "id,asc")),
+                            description = "Represents the ordering of results. Multiple sort parameters are supported"),
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Parking data retrieved successfully",
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ClientResponseDTO.class)))),
+                    @ApiResponse(responseCode = "403", description = "user without permission to access this resource",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
+            })
     @GetMapping(value = "/cpf/{cpf}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageableDTO> findAllParkingByCpf(@PathVariable String cpf, @PageableDefault(size = 5, sort = "entryDate", direction = Sort.Direction.ASC)Pageable pageable){
