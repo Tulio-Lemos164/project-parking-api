@@ -1,11 +1,14 @@
 package br.com.parkingprojectapi.web.controller;
 
 import br.com.parkingprojectapi.entity.ClientSpace;
+import br.com.parkingprojectapi.repository.projection.ClientSpaceProjection;
 import br.com.parkingprojectapi.service.ParkingService;
 import br.com.parkingprojectapi.web.controller.exceptions.StandardError;
+import br.com.parkingprojectapi.web.dto.PageableDTO;
 import br.com.parkingprojectapi.web.dto.ParkingInsertDTO;
 import br.com.parkingprojectapi.web.dto.ParkingResponseDTO;
 import br.com.parkingprojectapi.web.dto.mapper.ClientSpaceMapper;
+import br.com.parkingprojectapi.web.dto.mapper.PageableMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -16,6 +19,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -97,5 +104,13 @@ public class ParkingController {
         ClientSpace clientSpace = parkingService.checkOut(receipt);
         ParkingResponseDTO parkingResponseDTO = ClientSpaceMapper.toDTO(clientSpace);
         return ResponseEntity.ok().body(parkingResponseDTO);
+    }
+
+    @GetMapping(value = "/cpf/{cpf}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PageableDTO> findAllParkingByCpf(@PathVariable String cpf, @PageableDefault(size = 5, sort = "entryDate", direction = Sort.Direction.ASC)Pageable pageable){
+        Page<ClientSpaceProjection> projection = parkingService.findAllByClientCpf(cpf, pageable);
+        PageableDTO pageableDTO = PageableMapper.toDto(projection);
+        return ResponseEntity.ok().body(pageableDTO);
     }
 }
