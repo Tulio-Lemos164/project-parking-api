@@ -258,4 +258,53 @@ public class ParkingIT {
                 .jsonPath("status").isEqualTo("404")
                 .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-in/20230313-101344");
     }
+
+    @Test
+    public void createCheckOut_ExistingReceipt_ReturnDataStatus200(){
+        webTestClient
+                .put()
+                .uri("/api/v1/parking-lots/check-out/{receipt}", "20230313-101300")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("licensePlate").isEqualTo("FIT-1020")
+                .jsonPath("brand").isEqualTo("FIAT")
+                .jsonPath("model").isEqualTo("PALIO")
+                .jsonPath("color").isEqualTo("GREEN")
+                .jsonPath("clientCpf").isEqualTo("65712430088")
+                .jsonPath("receipt").isEqualTo("20230313-101300")
+                .jsonPath("entryDate").isEqualTo("2023-03-13 10:15:00")
+                .jsonPath("exitDate").exists()
+                .jsonPath("value").exists()
+                .jsonPath("discount").exists()
+                .jsonPath("spaceCode").isEqualTo("A-01");
+    }
+
+    @Test
+    public void createCheckOut_NonExistingReceipt_ReturnStandardErrorStatus404(){
+        webTestClient
+                .put()
+                .uri("/api/v1/parking-lots/check-out/{receipt}", "20230313-101344")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("status").isEqualTo("404")
+                .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-out/20230313-101344");
+    }
+
+    @Test
+    public void createCheckOut_RoleClient_ReturnStandardError403(){
+        webTestClient
+                .put()
+                .uri("/api/v1/parking-lots/check-out/{receipt}", "20230313-101300")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo("403")
+                .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-out/20230313-101300");
+    }
 }
