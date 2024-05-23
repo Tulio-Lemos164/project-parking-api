@@ -1,6 +1,8 @@
 package br.com.parkingprojectapi;
 
+import br.com.parkingprojectapi.web.dto.PageableDTO;
 import br.com.parkingprojectapi.web.dto.ParkingInsertDTO;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -306,5 +308,51 @@ public class ParkingIT {
                 .expectBody()
                 .jsonPath("status").isEqualTo("403")
                 .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-out/20230313-101300");
+    }
+
+    @Test
+    public void findAllParking_ByClientCpf_ReturnStatus200(){
+        PageableDTO responseBody;
+
+        responseBody = webTestClient
+                .get()
+                .uri("/api/v1/parking-lots/cpf/{cpf}?size=1&page=0", "65712430088")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PageableDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(0);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+
+        responseBody = webTestClient
+                .get()
+                .uri("/api/v1/parking-lots/cpf/{cpf}?size=1&page=1", "65712430088")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "barney@gmail.com", "barney"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PageableDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+    }
+
+    @Test
+    public void findAllParking_ByClientCpfWithRoleClient_ReturnStandardError403(){
+        webTestClient
+                .get()
+                .uri("/api/v1/parking-lots/cpf/{cpf}", "65712430088")
+                .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "ted@gmail.com", "arqted"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo("403")
+                .jsonPath("path").isEqualTo("/api/v1/parking-lots/cpf/65712430088");
     }
 }
