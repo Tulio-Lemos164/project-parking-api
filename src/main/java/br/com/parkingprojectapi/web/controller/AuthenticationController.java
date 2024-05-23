@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -42,7 +41,7 @@ public class AuthenticationController {
     @Operation(summary = "Authenticate a User for its username and password",
             responses = {
                     @ApiResponse(responseCode = "200", description = "User Authenticated successfully and returned a bearer token",
-                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class)))),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = JwtToken.class)))),
                     @ApiResponse(responseCode = "400", description = "Invalid credentials",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
                     @ApiResponse(responseCode = "422", description = "Invalid fields",

@@ -5,7 +5,6 @@ import br.com.parkingprojectapi.service.SpaceService;
 import br.com.parkingprojectapi.web.controller.exceptions.StandardError;
 import br.com.parkingprojectapi.web.dto.SpaceInsertDTO;
 import br.com.parkingprojectapi.web.dto.SpaceResponseDTO;
-import br.com.parkingprojectapi.web.dto.UserResponseDTO;
 import br.com.parkingprojectapi.web.dto.mapper.SpaceMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -63,7 +62,7 @@ public class SpaceController {
             security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "User retrieved successfully",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = SpaceResponseDTO.class))),
                     @ApiResponse(responseCode = "404", description = "Resource not found",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
                     @ApiResponse(responseCode = "403", description = "Resource not available for CLIENT role",

@@ -10,7 +10,6 @@ import br.com.parkingprojectapi.web.controller.exceptions.StandardError;
 import br.com.parkingprojectapi.web.dto.ClientInsertDTO;
 import br.com.parkingprojectapi.web.dto.ClientResponseDTO;
 import br.com.parkingprojectapi.web.dto.PageableDTO;
-import br.com.parkingprojectapi.web.dto.UserResponseDTO;
 import br.com.parkingprojectapi.web.dto.mapper.ClientMapper;
 import br.com.parkingprojectapi.web.dto.mapper.PageableMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,8 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "Clients", description = "Contains all the operations to inset, retrieve and update a client")
 @RestController
@@ -71,7 +68,7 @@ public class ClientController {
             security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Client retrieved successfully",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDTO.class))),
                     @ApiResponse(responseCode = "404", description = "Resource not found",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class))),
                     @ApiResponse(responseCode = "403", description = "Resource not available for CLIENT role",
@@ -99,7 +96,7 @@ public class ClientController {
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Clients retrieved successfully",
-                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class)))),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ClientResponseDTO.class)))),
                     @ApiResponse(responseCode = "403", description = "user without permission to access this resource",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
             })
@@ -114,7 +111,7 @@ public class ClientController {
             security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Client data retrieved successfully",
-                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class)))),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ClientResponseDTO.class)))),
                     @ApiResponse(responseCode = "403", description = "user without permission to access this resource",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardError.class)))
             })
