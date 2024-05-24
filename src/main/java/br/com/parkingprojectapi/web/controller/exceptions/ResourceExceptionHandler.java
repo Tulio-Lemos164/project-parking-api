@@ -84,4 +84,13 @@ public class ResourceExceptionHandler {
         log.error("API Error - " + e);
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<StandardError> internalServerErrorException(Exception e, HttpServletRequest request){
+        String error = "Internal server error";
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        log.error("Internal server error - " + e.getCause());
+        return ResponseEntity.status(status).body(err);
+    }
 }
