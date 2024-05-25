@@ -77,4 +77,9 @@ public class ParkingService {
     public Page<ClientSpaceProjection> findAllByUserId(Long id, Pageable pageable) {
         return clientSpaceService.findAllByUserId(id, pageable);
     }
+
+    @Transactional(readOnly = true)
+    public String findUserById(Long id) {
+        return clientService.findDetailsFromUserId(id).getCpf();
+    }
 }
